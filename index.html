@@ -169,6 +169,10 @@
                 </select>
               </div>
             </div>
+            <div class="field">
+              <label for="learn">What would you like to learn?</label>
+              <textarea id="learn" rows="3" placeholder="e.g. Build my first web app, learn Python, understand AI…" style="width:100%;padding:13px 14px;background:#0b0b0c;border:1px solid var(--line);border-radius:10px;color:var(--ink);font-size:15px;font-family:inherit;resize:vertical;transition:border-color .15s,box-shadow .15s"></textarea>
+            </div>
             <button type="submit" class="submit">Join the waitlist →</button>
             <p class="micro">We'll never spam. Unsubscribe anytime.</p>
           </form>
@@ -247,6 +251,7 @@
     const email = document.getElementById('email').value.trim();
     const role  = document.getElementById('role').value;
     const track = document.getElementById('track').value;
+    const learn = document.getElementById('learn').value.trim();
 
     if (name.length < 2 || !email.includes('@') || !role || !track) {
       alert('Please fill all fields with valid info.');
@@ -259,7 +264,7 @@
     fetch(SCRIPT_URL, {
       method: 'POST',
       mode: 'no-cors',
-      body: JSON.stringify({ name, email, role, track }),
+      body: JSON.stringify({ name, email, role, track, learn }),
     }).then(() => {
       wrap.style.display = 'none';
       success.classList.add('show');
