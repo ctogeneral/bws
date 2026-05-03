@@ -176,7 +176,7 @@
         <div class="success" id="success">
           <div class="check">✓</div>
           <h3>You're on the list!</h3>
-          <p>Check your inbox in a few minutes for a confirmation. We'll reach out the moment Cohort 03 opens.</p>
+          <p>Check your inbox in a few minutes for a confirmation. We'll reach out the moment Cohort 01 opens.</p>
         </div>
       </div>
     </div>
@@ -196,7 +196,7 @@
     <div class="section-eyebrow">// Frequently asked</div>
     <h2 class="section">Still wondering?</h2>
     <div style="margin-top:24px">
-      <details open><summary>When does the next cohort start?</summary><p>Cohort 03 opens for booking in August 2026. Waitlist members are notified 48 hours before the public.</p></details>
+      <details open><summary>When does the next cohort start?</summary><p>Cohort 01 opens for booking in June 2026. Waitlist members are notified 48 hours before the public.</p></details>
       <details><summary>Is this only for kids?</summary><p>No. Salem mentors students, parents, working professionals, and career switchers. Tracks are tailored per builder.</p></details>
       <details><summary>What if I'm a complete beginner?</summary><p>Perfect. The Beginner track starts from zero — Portfolio site, Birthday card, then your first interactive app.</p></details>
       <details><summary>Do I have to pay to join the waitlist?</summary><p>Not at all. Joining is free. You only pay when you book an actual project once your slot opens.</p></details>
@@ -216,42 +216,58 @@
   </footer>
 
 <script>
-  // Countdown to August 1, 2026 09:00 WAT (UTC+1) => 08:00 UTC
-  const target = new Date(Date.UTC(2026, 7, 1, 8, 0, 0)).getTime();
+  // Countdown to June 1, 2026 09:00 WAT (UTC+1) => 08:00 UTC
+  const target = new Date(Date.UTC(2026, 5, 1, 8, 0, 0)).getTime();
   const pad = (n) => String(n).padStart(2, '0');
-  const tick = () => {
-    const diff = Math.max(0, target - Date.now());
-    const d = Math.floor(diff / 86400000);
-    const h = Math.floor((diff % 86400000) / 3600000);
-    const m = Math.floor((diff % 3600000) / 60000);
-    const s = Math.floor((diff % 60000) / 1000);
-    document.getElementById('cd-d').textContent = pad(d);
-    document.getElementById('cd-h').textContent = pad(h);
-    document.getElementById('cd-m').textContent = pad(m);
-    document.getElementById('cd-s').textContent = pad(s);
-  };
-  tick(); setInterval(tick, 1000);
+  const cdD = document.getElementById('cd-d');
+  const cdH = document.getElementById('cd-h');
+  const cdM = document.getElementById('cd-m');
+  const cdS = document.getElementById('cd-s');
+  if (cdD && cdH && cdM && cdS) {
+    const tick = () => {
+      const diff = Math.max(0, target - Date.now());
+      cdD.textContent = pad(Math.floor(diff / 86400000));
+      cdH.textContent = pad(Math.floor((diff % 86400000) / 3600000));
+      cdM.textContent = pad(Math.floor((diff % 3600000) / 60000));
+      cdS.textContent = pad(Math.floor((diff % 60000) / 1000));
+    };
+    tick(); setInterval(tick, 1000);
+  }
 
-  const form = document.getElementById('waitlist-form');
-  const wrap = document.getElementById('form-wrap');
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwjGi8EGq1YD1rKBjfbAcRN5kU2Bo6xCijOZaq6elwcwFKzw1_Fsf0ZNVwSrGaELYsKXQ/exec';
+
+  const form    = document.getElementById('waitlist-form');
+  const wrap    = document.getElementById('form-wrap');
   const success = document.getElementById('success');
+  const btn     = form.querySelector('button.submit');
+
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    const name = document.getElementById('name').value.trim();
+    const name  = document.getElementById('name').value.trim();
     const email = document.getElementById('email').value.trim();
-    const role = document.getElementById('role').value;
+    const role  = document.getElementById('role').value;
     const track = document.getElementById('track').value;
+
     if (name.length < 2 || !email.includes('@') || !role || !track) {
       alert('Please fill all fields with valid info.');
       return;
     }
-    try {
-      const list = JSON.parse(localStorage.getItem('bws_waitlist') || '[]');
-      list.push({ name, email, role, track, at: new Date().toISOString() });
-      localStorage.setItem('bws_waitlist', JSON.stringify(list));
-    } catch(_) {}
-    wrap.style.display = 'none';
-    success.classList.add('show');
+
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: JSON.stringify({ name, email, role, track }),
+    }).then(() => {
+      wrap.style.display = 'none';
+      success.classList.add('show');
+    }).catch(() => {
+      btn.disabled = false;
+      btn.textContent = 'Join the waitlist →';
+      alert('Something went wrong. Please try again.');
+    });
   });
 </script>
 </body>
